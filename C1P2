@@ -1,0 +1,64 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+def earth_moon_system(T, xe, xm, omega_e, omega_m, num_points=1000):
+"""
+Computes and plots the trajectories of the Earth and the Moon
+orbiting the Sun using linear and affine transformations.
+
+Parameters:
+- T (float): Final time
+- xe (float): Initial x-position of the earth (pe(0) = [xe, 0])
+- xm (float): Initial x-position of the moon (pm(0) = [xm, 0])
+- omega_e (float): Angular momentum/velocity of the earth
+- omega_m (float): Angular momentum/velocity of the moon
+- num_points (int): Resolution of time steps
+"""
+# Time interval t from 0 to T
+t = np.linspace(0, T, num_points)
+
+# 1. Compute Earth's trajectory pe(t)
+# Rotating initial vector (xe, 0) counterclockwise by omega_e * t
+pe_x = xe * np.cos(omega_e * t)
+pe_y = xe * np.sin(omega_e * t)
+earth = np.array([pe_x, pe_y]) # Shape: (2, num_points)
+
+# 2. Compute Moon's position relative to the earth
+# Initial relative vector: pm(0) - pe(0) = (xm - xe, 0)
+dx = xm - xe
+pm_rel_x = dx * np.cos(omega_m * t)
+pm_rel_y = dx * np.sin(omega_m * t)
+moon_rel = np.array([pm_rel_x, pm_rel_y])
+
+# 3. Translate the relative position by pe(t) to get absolute pm(t)
+moon = earth + moon_rel
+
+# 4. Plotting the trajectories
+fig, ax = plt.subplots(figsize=(8, 8))
+
+# Plot Earth trajectory
+ax.plot(earth[0], earth[1], color='blue', label='Earth Orbit')
+ax.plot(earth[0][-1], earth[1][-1], 'bo', markersize=8, label='Earth')
+
+# Plot Moon trajectory
+ax.plot(moon[0], moon[1], color='green', alpha=0.7, label='Moon Orbit')
+ax.plot(moon[0][-1], moon[1][-1], 'go', markersize=5, label='Moon')
+
+# Plot Sun at the origin (0, 0)
+ax.plot([0], [0], marker='*', color='gold', markersize=20, label='Sun')
+
+# Format the plot as specified in the lab manual
+ax.set_aspect("equal") # Fix the aspect ratio
+ax.set_title(f"Earth and Moon Orbits (T = {T})")
+ax.set_xlabel("X")
+ax.set_ylabel("Y")
+ax.legend(loc='upper right')
+ax.grid(True)
+
+plt.show()
+
+return earth, moon
+
+# --- Test with the parameters provided in the manual ---
+# T = 3 * np.pi, xe = 10, xm = 11, omega_e = 1, omega_m = 13
+earth_moon_system(T=3 * np.pi, xe=10, xm=11, omega_e=1, omega_m=13)
