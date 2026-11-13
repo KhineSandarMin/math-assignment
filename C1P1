@@ -1,0 +1,62 @@
+import numpy as np
+import matplotlib.pyplot as plt
+
+# 1. Square plot
+x = np.linspace(-0.5, 0.5, 100)
+top = np.vstack([x, np.full_like(x, 0.5)])
+bottom = np.vstack([x, np.full_like(x, -0.5)])
+left = np.vstack([np.full_like(x, -0.5), x])
+right = np.vstack([np.full_like(x, 0.5), x])
+square = np.hstack([top, bottom, left, right])
+
+# 2. Linear Transformation Functions
+def stretch(A, a, b):
+    T = np.array([[a, 0], [0, b]])
+    return T @ A
+
+def shear(A, a, b):
+    T = np.array([[1, a], [b, 1]])
+    return T @ A
+
+def reflection(A, a, b):
+    norm_sq = a**2 + b**2
+    if norm_sq == 0:
+        T = np.eye(2)
+    else:
+        T = np.array([[a**2 - b**2, 2*a*b], [2*a*b, b**2 - a**2]]) / norm_sq
+    return T @ A
+
+def rotation(A, theta):
+    c, s = np.cos(theta), np.sin(theta)
+    T = np.array([[c, -s], [s, c]])
+    return T @ A
+
+# 3. Plot add Composition(Original, Stretch, Shear, Reflection, Rotation, Composition)
+def plot_all_transformations():
+   
+    t_stretch = stretch(square, 1.5, 0.8)
+    t_shear = shear(square, 0.5, 0.0)
+    t_reflection = reflection(square, 1.0, 1.0)
+    t_rotation = rotation(square, np.pi / 4)
+    
+    # Composition (Stretch -> Shear -> Reflection -> Rotation)
+    comp_1 = stretch(square, 1.5, 0.8)
+    comp_2 = shear(comp_1, 0.5, 0.0)
+    comp_3 = reflection(comp_2, 1.0, 1.0)
+    t_composition = rotation(comp_3, np.pi / 4)
+    
+    fig, axes = plt.subplots(1, 6, figsize=(18, 3))
+    titles = ["Original", "Stretch", "Shear", "Reflection", "Rotation", "Composition"]
+    data_list = [square, t_stretch, t_shear, t_reflection, t_rotation, t_composition]
+    
+    for ax, pts, title in zip(axes, data_list, titles):
+        ax.plot(pts[0], pts[1], 'k.', markersize=2)
+        ax.set_title(title)
+        ax.set_aspect("equal")
+        ax.axis([-2.0, 2.0, -2.0, 2.0])
+        
+    plt.tight_layout()
+    plt.show()
+
+# Run
+plot_all_transformations()
