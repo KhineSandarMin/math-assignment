@@ -1,0 +1,25 @@
+import numpy as np
+from scipy import linalg as la
+
+def compact_svd(A, tol=1e-8):
+    AhA = A.conj().T @ A
+    vals, V = la.eig(AhA)
+    sigma = np.sqrt(np.abs(vals))
+    idx = np.argsort(sigma)[::-1]
+    sigma = sigma[idx]
+    V = V[:, idx]
+    r = np.sum(sigma > tol)
+    sigma1 = sigma[:r]
+    V1 = V[:, :r]
+    U1 = (A @ V1) / sigma1
+    return U1, sigma1, V1.conj().T
+
+A = np.random.random((10, 5))
+U, s, Vh = compact_svd(A, 1e-8)
+
+print("U shape:", U.shape)
+print("s shape:", s.shape)
+print("Vh shape:", Vh.shape)
+print("U is orthonormal:", np.allclose(U.T @ U, np.identity(5)))
+print("USigmaVh equals A:", np.allclose(U @ np.diag(s) @ Vh, A))
+print("Number of nonzero singular values equals rank:", len(s) == np.linalg.matrix_rank(A))
