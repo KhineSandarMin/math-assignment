@@ -48,5 +48,4 @@ def earth_moon_system(T, xe, xm, omega_e, omega_m, num_points=1000):
     plt.show()
     return earth, moon
 
-# Call the function
 earth_moon_system(T=3 * np.pi, xe=10, xm=11, omega_e=1, omega_m=13)
