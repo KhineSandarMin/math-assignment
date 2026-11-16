@@ -1,0 +1,48 @@
+import time
+import numpy as np
+from scipy import linalg as la
+import matplotlib.pyplot as plt
+
+domain = 2**np.arange(1, 9)
+inv_times = []
+solve_times = []
+lu_both_times = []
+lu_solve_times = []
+
+for n in domain:
+    A = np.random.random((n, n))
+    b = np.random.random(n)
+
+    start = time.time()
+    la.inv(A) @ b
+    inv_times.append(time.time() - start)
+
+    start = time.time()
+    la.solve(A, b)
+    solve_times.append(time.time() - start)
+
+    start = time.time()
+    L, P = la.lu_factor(A)
+    la.lu_solve((L, P), b)
+    lu_both_times.append(time.time() - start)
+
+    L, P = la.lu_factor(A)
+    start = time.time()
+    la.lu_solve((L, P), b)
+    lu_solve_times.append(time.time() - start)
+
+print("Domain (n):", domain.tolist())
+print("la.inv() times:", inv_times)
+print("la.solve() times:", solve_times)
+print("lu_factor + lu_solve times:", lu_both_times)
+print("lu_solve only times:", lu_solve_times)
+
+plt.figure()
+plt.loglog(domain, inv_times, 'o-', label="la.inv()")
+plt.loglog(domain, solve_times, 'o-', label="la.solve()")
+plt.loglog(domain, lu_both_times, 'o-', label="lu_factor + lu_solve")
+plt.loglog(domain, lu_solve_times, 'o-', label="lu_solve only")
+plt.xlabel("n")
+plt.ylabel("Seconds")
+plt.legend(loc="upper left")
+plt.show()
