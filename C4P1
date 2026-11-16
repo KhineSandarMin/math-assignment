@@ -1,0 +1,17 @@
+import numpy as np
+from scipy import linalg as la
+
+def problem_1(A, b):
+    Q, R = la.qr(A, mode="economic")
+    y = Q.T @ b
+    x = la.solve_triangular(R, y)
+    return x
+
+m, n = 6, 4
+A = np.random.random((m, n))
+b = np.random.random(m)
+
+x = problem_1(A, b)
+
+print("Least squares solution x:", x)
+print("Matches scipy.linalg.lstsq():", np.allclose(x, la.lstsq(A, b)[0]))
