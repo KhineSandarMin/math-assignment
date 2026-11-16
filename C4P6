@@ -1,0 +1,42 @@
+import numpy as np
+from scipy import linalg as la
+import cmath
+
+def problem_6(A, N, tol):
+    m, n = A.shape
+    S = la.hessenberg(A)
+    for k in range(N):
+        Q, R = la.qr(S)
+        S = R @ Q
+    eigs = []
+    i = 0
+    while i < n:
+        if i == n - 1 or abs(S[i + 1, i]) < tol:
+            eigs.append(S[i, i])
+            i += 1
+        else:
+            a = S[i, i]
+            b = S[i, i + 1]
+            c = S[i + 1, i]
+            d = S[i + 1, i + 1]
+            trace = a + d
+            det = a * d - b * c
+            discrim = trace**2 - 4 * det
+            sqrt_discrim = cmath.sqrt(discrim)
+            lam1 = (trace + sqrt_discrim) / 2
+            lam2 = (trace - sqrt_discrim) / 2
+            eigs.append(lam1)
+            eigs.append(lam2)
+            i += 2
+    return np.array(eigs)
+
+np.random.seed(42)
+A_rand = np.random.random((5, 5))
+A_sym = A_rand + A_rand.T
+
+computed_eigs = problem_6(A_sym, 50, 1e-8)
+true_eigs = la.eig(A_sym)[0]
+
+print("Computed Eigenvalues (QR Algorithm):", computed_eigs)
+print("True Eigenvalues (SciPy eig):", true_eigs)
+print("Results match:", np.allclose(np.sort(computed_eigs), np.sort(true_eigs)))
