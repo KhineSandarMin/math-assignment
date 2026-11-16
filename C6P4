@@ -1,0 +1,30 @@
+import numpy as np
+from scipy import linalg as la
+
+def problem_4(A, epsilon):
+    U, s_vals, Vh = la.svd(A, full_matrices=False)
+
+    if epsilon <= s_vals[-1]:
+        raise ValueError("Epsilon cannot be less than or equal to the smallest singular value of A.")
+    
+    s = np.where(s_vals < epsilon)[0][0]
+    
+    U_s = U[:, :s]
+    s_s = s_vals[:s]
+    Vh_s = Vh[:s, :]
+    As = (U_s * s_s) @ Vh_s
+    
+    storage = U_s.size + s_s.size + Vh_s.size
+    
+    return As, storage
+
+A = np.random.random((20, 20))
+epsilon = 0.5
+
+As, storage = problem_4(A, epsilon)
+error = la.norm(A - As, ord=2)
+
+print("Truncated Matrix As shape:", As.shape)
+print("Storage entries required:", storage)
+print("2-norm error ||A - As||_2:", error)
+print("Error is less than epsilon:", error < epsilon)
