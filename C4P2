@@ -2,6 +2,14 @@ import numpy as np
 from scipy import linalg as la
 import matplotlib.pyplot as plt
 
+np.random.seed(42)
+years = np.linspace(0, 10, 30)
+
+index = 5.2 * years + 135.0 + np.random.normal(0, 3.5, size=years.shape)
+
+mock_housing_data = np.column_stack((years, index))
+np.save("housing.npy", mock_housing_data)
+
 def problem_1(A, b):
     Q, R = la.qr(A, mode="economic")
     y = Q.T @ b
@@ -15,15 +23,18 @@ def problem_2():
     
     slope, intercept = problem_1(A, b)
     
+    print("--- Least Squares Line Parameters ---")
     print("Slope (a):", slope)
     print("Intercept (b):", intercept)
     
-    plt.figure()
-    plt.scatter(year, index, label="Data Points")
-    plt.plot(year, slope * year + intercept, color="red", label="Least Squares Line")
-    plt.xlabel("Year")
+    plt.figure(figsize=(8, 5))
+    plt.scatter(year, index, color="black", label="Data Points")
+    plt.plot(year, slope * year + intercept, color="red", linewidth=2, label="Least Squares Fit")
+    plt.xlabel("Year (0 = 2000)")
     plt.ylabel("Housing Price Index")
+    plt.title("U.S. Housing Price Index - Linear Least Squares Fit")
     plt.legend()
+    plt.grid(True, linestyle="--", alpha=0.6)
     plt.show()
 
 problem_2()
