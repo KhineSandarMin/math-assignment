@@ -1,0 +1,16 @@
+import numpy as np
+from scipy import linalg as la
+
+def problem_3(A, b):
+    Q, R = la.qr(A)
+    y = Q.T @ b
+    x = la.solve_triangular(R, y)
+    return x
+
+A = np.array([[2, 1, 1], [4, 3, 3], [8, 7, 9]], dtype=float)
+b = np.array([4, 10, 24], dtype=float)
+
+x = problem_3(A, b)
+
+print("Solution vector x:", x)
+print("Matches la.solve():", np.allclose(x, la.solve(A, b)))
