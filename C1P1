@@ -1,7 +1,6 @@
 import numpy as np
 import matplotlib.pyplot as plt
 
-# 1. Square plot
 x = np.linspace(-0.5, 0.5, 100)
 top = np.vstack([x, np.full_like(x, 0.5)])
 bottom = np.vstack([x, np.full_like(x, -0.5)])
@@ -9,7 +8,6 @@ left = np.vstack([np.full_like(x, -0.5), x])
 right = np.vstack([np.full_like(x, 0.5), x])
 square = np.hstack([top, bottom, left, right])
 
-# 2. Linear Transformation Functions
 def stretch(A, a, b):
     T = np.array([[a, 0], [0, b]])
     return T @ A
@@ -31,7 +29,6 @@ def rotation(A, theta):
     T = np.array([[c, -s], [s, c]])
     return T @ A
 
-# 3. Plot add Composition(Original, Stretch, Shear, Reflection, Rotation, Composition)
 def plot_all_transformations():
    
     t_stretch = stretch(square, 1.5, 0.8)
@@ -39,7 +36,6 @@ def plot_all_transformations():
     t_reflection = reflection(square, 1.0, 1.0)
     t_rotation = rotation(square, np.pi / 4)
     
-    # Composition (Stretch -> Shear -> Reflection -> Rotation)
     comp_1 = stretch(square, 1.5, 0.8)
     comp_2 = shear(comp_1, 0.5, 0.0)
     comp_3 = reflection(comp_2, 1.0, 1.0)
@@ -58,5 +54,4 @@ def plot_all_transformations():
     plt.tight_layout()
     plt.show()
 
-# Run
 plot_all_transformations()
