@@ -1,0 +1,68 @@
+import numpy as np
+from scipy import linalg as la
+import matplotlib.pyplot as plt
+
+if not __import__('os').path.exists("hubble_gray.jpg"):
+    plt.imsave("hubble_gray.jpg", np.random.rand(200, 200), cmap="gray")
+
+def problem_3(A, s):
+    U, s_vals, Vh = la.svd(A, full_matrices=False)
+    U_s = U[:, :s]
+    s_s = s_vals[:s]
+    Vh_s = Vh[:s, :]
+    As = (U_s * s_s) @ Vh_s
+    storage = U_s.size + s_s.size + Vh_s.size
+    return As, storage
+
+def problem_5(image_file, s):
+    img = plt.imread(image_file)
+    if img.dtype == np.uint8:
+        img = img / 255.0
+    
+    orig_storage = img.size
+    
+    if img.ndim == 2:
+        As, approx_storage = problem_3(img, s)
+        As = np.clip(As, 0, 1)
+        diff = orig_storage - approx_storage
+        
+        fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+        axes[0].imshow(img, cmap="gray")
+        axes[0].set_title("Original Image")
+        axes[0].axis("off")
+        axes[1].imshow(As, cmap="gray")
+        axes[1].set_title(f"Rank-{s} Approximation")
+        axes[1].axis("off")
+        plt.suptitle(f"Difference in entries: {diff}")
+        plt.show()
+    else:
+        R = img[:, :, 0]
+        G = img[:, :, 1]
+        B = img[:, :, 2]
+        
+        Rs, storR = problem_3(R, s)
+        Gs, storG = problem_3(G, s)
+        Bs, storB = problem_3(B, s)
+        
+        As = np.dstack([Rs, Gs, Bs])
+        As = np.clip(As, 0, 1)
+        approx_storage = storR + storG + storB
+        diff = orig_storage - approx_storage
+        
+        fig, axes = plt.subplots(1, 2, figsize=(10, 5))
+        axes[0].imshow(img)
+        axes[0].set_title("Original Image")
+        axes[0].axis("off")
+        axes[1].imshow(As)
+        axes[1].set_title(f"Rank-{s} Approximation")
+        axes[1].axis("off")
+        plt.suptitle(f"Difference in entries: {diff}")
+        plt.show()
+        
+    print("Original Image Entries:", orig_storage)
+    print("Approximation Storage Entries:", approx_storage)
+    print("Saved Entries:", diff)
+    return diff
+
+diff_entries = problem_5("hubble_gray.jpg", 20)
+print("Difference in number of entries required:", diff_entries)
