@@ -1,0 +1,29 @@
+import numpy as np
+from scipy import linalg as la
+import matplotlib.pyplot as plt
+
+def problem_1(A, b):
+    Q, R = la.qr(A, mode="economic")
+    y = Q.T @ b
+    x = la.solve_triangular(R, y)
+    return x
+
+def problem_2():
+    year, index = np.load("housing.npy").T
+    A = np.column_stack((year, np.ones_like(year)))
+    b = index
+    
+    slope, intercept = problem_1(A, b)
+    
+    print("Slope (a):", slope)
+    print("Intercept (b):", intercept)
+    
+    plt.figure()
+    plt.scatter(year, index, label="Data Points")
+    plt.plot(year, slope * year + intercept, color="red", label="Least Squares Line")
+    plt.xlabel("Year")
+    plt.ylabel("Housing Price Index")
+    plt.legend()
+    plt.show()
+
+problem_2()
