@@ -1,0 +1,57 @@
+import random
+import time
+import matplotlib.pyplot as plt
+
+def matrix_vector_product(A, x):
+    """Compute the matrix-vector product Ax as a list."""
+    m, n = len(A), len(x)
+    return [sum([A[i][k] * x[k] for k in range(n)]) for i in range(m)]
+
+def matrix_matrix_product(A, B):
+    """Compute the matrix-matrix product AB as a list of lists."""
+    m, n, p = len(A), len(B), len(B[0])
+    return [[sum([A[i][k] * B[k][j] for k in range(n)])
+             for j in range(p)]
+            for i in range(m)]
+
+def random_matrix(m, n):
+    """Generate an m x n matrix using pure Python lists."""
+    return [[random.random() for _ in range(n)] for _ in range(m)]
+
+def random_vector(n):
+    """Generate an n-element vector using a pure Python list."""
+    return [random.random() for _ in range(n)]
+
+n_values = [2**i for i in range(1, 9)]  # [2, 4, 8, 16, 32, 64, 128, 256]
+mv_times = []
+mm_times = []
+
+for n in n_values:
+    A = random_matrix(n, n)
+    x = random_vector(n)
+    B = random_matrix(n, n)
+    
+    start = time.time()
+    matrix_vector_product(A, x)
+    mv_times.append(time.time() - start)
+    
+    start = time.time()
+    matrix_matrix_product(A, B)
+    mm_times.append(time.time() - start)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(12, 5))
+
+ax1.plot(n_values, mv_times, 'o-', label='Matrix-Vector')
+ax1.set_title('Matrix-Vector Multiplication')
+ax1.set_xlabel('n')
+ax1.set_ylabel('Seconds')
+ax1.grid(True)
+
+ax2.plot(n_values, mm_times, 'o-', color='orange', label='Matrix-Matrix')
+ax2.set_title('Matrix-Matrix Multiplication')
+ax2.set_xlabel('n')
+ax2.set_ylabel('Seconds')
+ax2.grid(True)
+
+plt.tight_layout()
+plt.show()
