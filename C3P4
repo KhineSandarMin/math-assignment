@@ -1,0 +1,23 @@
+import numpy as np
+from scipy import linalg as la
+
+def householder(A):
+    m, n = A.shape
+    R = np.copy(A)
+    Q = np.identity(m)
+    sign = lambda x: 1 if x >= 0 else -1
+    for k in range(n):
+        u = np.copy(R[k:, k])
+        u[0] += sign(u[0]) * la.norm(u)
+        u = u / la.norm(u)
+        R[k:, k:] -= np.outer(2 * u, u @ R[k:, k:])
+        Q[k:, :] -= np.outer(2 * u, u @ Q[k:, :])
+    return Q.T, R
+
+A = np.random.random((5, 3))
+Q, R = householder(A)
+
+print("A shape, Q shape, R shape:", A.shape, Q.shape, R.shape)
+print("QR equals A:", np.allclose(Q @ R, A))
+print("Q is orthonormal:", np.allclose(Q.T @ Q, np.identity(5)))
+print("R is upper triangular:", np.allclose(np.triu(R), R))
