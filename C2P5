@@ -1,0 +1,30 @@
+import numpy as np
+from scipy import sparse
+import matplotlib.pyplot as plt
+
+def problem_5(n):
+    B = sparse.diags([1, -4, 1], [-1, 0, 1], shape=(n, n), dtype=float)
+    I = sparse.eye(n, dtype=float)
+    blocks = [[None for _ in range(n)] for _ in range(n)]
+    for i in range(n):
+        blocks[i][i] = B
+        if i > 0:
+            blocks[i][i-1] = I
+        if i < n - 1:
+            blocks[i][i+1] = I
+    A = sparse.bmat(blocks, format='csr')
+    return A
+
+n = 3
+A = problem_5(n)
+
+print("Matrix A shape:", A.shape)
+print("Number of non-zero entries:", A.nnz)
+print("\nDense representation of A:")
+print(A.toarray())
+
+plt.figure(figsize=(6, 6))
+plt.spy(A, markersize=10)
+plt.xlabel("Column Index")
+plt.ylabel("Row Index")
+plt.show()
