@@ -1,0 +1,45 @@
+import numpy as np
+from scipy import linalg as la
+import matplotlib.pyplot as plt
+
+np.random.seed(42)
+theta_pts = np.linspace(0, 2 * np.pi, 150)
+xk = 3.0 * np.cos(theta_pts) + np.random.normal(0, 0.03, size=theta_pts.shape)
+yk = 2.0 * np.sin(theta_pts) + np.random.normal(0, 0.03, size=theta_pts.shape)
+
+mock_ellipse_data = np.column_stack((xk, yk))
+np.save("ellipse.npy", mock_ellipse_data)
+
+def plot_ellipse(a, b, c, d, e):
+    """Plot an ellipse of the form ax^2 + bx + cxy + dy + ey^2 = 1."""
+    theta = np.linspace(0, 2 * np.pi, 200)
+    cos_t, sin_t = np.cos(theta), np.sin(theta)
+    A_mat = a * (cos_t**2) + c * cos_t * sin_t + e * (sin_t**2)
+    B_mat = b * cos_t + d * sin_t
+    r = (-B_mat + np.sqrt(B_mat**2 + 4 * A_mat)) / (2 * A_mat)
+    plt.plot(r * cos_t, r * sin_t, lw=2, color="red", label="Least Squares Ellipse")
+    plt.gca().set_aspect("equal", "datalim")
+
+def problem_4():
+    xk, yk = np.load("ellipse.npy").T
+    
+    A = np.column_stack((xk**2, xk, xk * yk, yk, yk**2))
+    b = np.ones_like(xk)
+    
+    a, b_param, c, d, e = la.lstsq(A, b)[0]
+    
+    print("--- Ellipse Least Squares Parameters ---")
+    print(f"a (x^2): {a}")
+    print(f"b (x):   {b_param}")
+    print(f"c (xy):  {c}")
+    print(f"d (y):   {d}")
+    print(f"e (y^2): {e}")
+    
+    plt.figure(figsize=(6, 6))
+    plt.plot(xk, yk, 'k*', label="Data Points")
+    plot_ellipse(a, b_param, c, d, e)
+    plt.title("Ellipse Fitting via Least Squares")
+    plt.legend()
+    plt.show()
+
+problem_4()
