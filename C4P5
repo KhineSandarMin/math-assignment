@@ -1,0 +1,28 @@
+import numpy as np
+from scipy import linalg as la
+
+def problem_5(A, N, tol):
+    m, n = A.shape
+    x = np.random.random(n)
+    x = x / la.norm(x)
+    for k in range(N):
+        x_next = A @ x
+        x_next = x_next / la.norm(x_next)
+        if la.norm(x_next - x) < tol:
+            x = x_next
+            break
+        x = x_next
+    lamb = x.T @ A @ x
+    return lamb, x
+
+A = np.random.random((10, 10))
+lamb, x = problem_5(A, 1000, 1e-8)
+
+eigs, vecs = la.eig(A)
+loc = np.argmax(eigs)
+true_lamb = eigs[loc]
+
+print("Dominant Eigenvalue (Power Method):", lamb)
+print("Dominant Eigenvalue (SciPy eig):", true_lamb)
+print("Eigenvector matches Ax = lambda x:", np.allclose(A @ x, lamb * x))
+print("Lambda is dominant eigenvalue:", np.allclose(lamb, true_lamb))
