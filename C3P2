@@ -1,0 +1,16 @@
+import numpy as np
+from scipy import linalg as la
+
+def problem_2(A):
+    Q, R = la.qr(A)
+    return np.prod(np.abs(np.diag(R)))
+
+A = np.random.random((4, 4))
+
+computed_det = problem_2(A)
+actual_det = np.abs(la.det(A))
+
+print("Matrix A:\n", A)
+print("\nCalculated |det(A)| using QR decomposition:", computed_det)
+print("Actual |det(A)| using la.det():", actual_det)
+print("Matches la.det():", np.allclose(computed_det, actual_det))
