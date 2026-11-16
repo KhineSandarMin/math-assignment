@@ -10,7 +10,6 @@ mock_housing_data = np.column_stack((years, index))
 np.save("housing.npy", mock_housing_data)
 
 def problem_3():
-
     year, index = np.load("housing.npy").T
     degrees = [3, 6, 9, 12]
     
@@ -43,3 +42,5 @@ def problem_3():
         
     plt.tight_layout()
     plt.show()
+
+problem_3()
