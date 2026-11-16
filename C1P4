@@ -1,0 +1,76 @@
+import random
+import time
+import numpy as np
+import matplotlib.pyplot as plt
+
+def matrix_vector_product(A, x):
+    m, n = len(A), len(x)
+    return [sum([A[i][k] * x[k] for k in range(n)]) for i in range(m)]
+
+def matrix_matrix_product(A, B):
+    m, n, p = len(A), len(B), len(B[0])
+    return [[sum([A[i][k] * B[k][j] for k in range(n)]) for j in range(p)] for i in range(m)]
+
+def random_matrix(m, n):
+    return [[random.random() for _ in range(n)] for _ in range(m)]
+
+def random_vector(n):
+    return [random.random() for _ in range(n)]
+
+n_values = [2**i for i in range(1, 9)]
+mv_list_times = []
+mm_list_times = []
+mv_np_times = []
+mm_np_times = []
+
+for n in n_values:
+    A_list = random_matrix(n, n)
+    x_list = random_vector(n)
+    B_list = random_matrix(n, n)
+    
+    A_np = np.array(A_list)
+    x_np = np.array(x_list)
+    B_np = np.array(B_list)
+    
+    start = time.time()
+    matrix_vector_product(A_list, x_list)
+    mv_list_times.append(time.time() - start)
+    
+    start = time.time()
+    matrix_matrix_product(A_list, B_list)
+    mm_list_times.append(time.time() - start)
+    
+    start = time.time()
+    A_np @ x_np
+    mv_np_times.append(time.time() - start)
+    
+    start = time.time()
+    A_np @ B_np
+    mm_np_times.append(time.time() - start)
+
+fig, (ax1, ax2) = plt.subplots(1, 2, figsize=(14, 6))
+
+ax1.plot(n_values, mv_list_times, 'o-', label='Matrix-Vector (List)')
+ax1.plot(n_values, mm_list_times, 'o-', label='Matrix-Matrix (List)')
+ax1.plot(n_values, mv_np_times, 'o-', label='Matrix-Vector (NumPy)')
+ax1.plot(n_values, mm_np_times, 'o-', label='Matrix-Matrix (NumPy)')
+ax1.set_title('Linear Scale')
+ax1.set_xlabel('n')
+ax1.set_ylabel('Seconds')
+ax1.legend()
+ax1.grid(True)
+
+ax2.plot(n_values, mv_list_times, 'o-', label='Matrix-Vector (List)')
+ax2.plot(n_values, mm_list_times, 'o-', label='Matrix-Matrix (List)')
+ax2.plot(n_values, mv_np_times, 'o-', label='Matrix-Vector (NumPy)')
+ax2.plot(n_values, mm_np_times, 'o-', label='Matrix-Matrix (NumPy)')
+ax2.set_xscale('log', base=2)
+ax2.set_yscale('log', base=2)
+ax2.set_title('Log-Log Scale')
+ax2.set_xlabel('n')
+ax2.set_ylabel('Seconds')
+ax2.legend()
+ax2.grid(True, which='both')
+
+plt.tight_layout()
+plt.show()
