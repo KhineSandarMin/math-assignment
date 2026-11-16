@@ -1,0 +1,22 @@
+import numpy as np
+from scipy import linalg as la
+
+def problem_5(A):
+    m, n = A.shape
+    H = np.copy(A)
+    Q = np.identity(m)
+    sign = lambda x: 1 if x >= 0 else -1
+    for k in range(n - 2):
+        u = np.copy(H[k+1:, k])
+        u[0] += sign(u[0]) * la.norm(u)
+        u = u / la.norm(u)
+        H[k+1:, k:] -= np.outer(2 * u, u @ H[k+1:, k:])
+        H[:, k+1:] -= np.outer(H[:, k+1:] @ u, 2 * u)
+        Q[k+1:, :] -= np.outer(2 * u, u @ Q[k+1:, :])
+    return H, Q.T
+
+A = np.random.random((8, 8))
+H, Q = problem_5(A)
+
+print("H has zeros below first subdiagonal:", np.allclose(np.triu(H, -1), H))
+print("QHQ^T equals A:", np.allclose(Q @ H @ Q.T, A))
