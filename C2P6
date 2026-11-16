@@ -1,0 +1,52 @@
+import time
+import numpy as np
+from scipy import sparse
+from scipy.sparse import linalg as spla
+from scipy import linalg as la
+import matplotlib.pyplot as plt
+
+def problem_6():
+    domain = np.array([2, 3, 4, 5, 6, 7, 8])
+    sparse_times = []
+    dense_times = []
+    sizes = []
+
+    for n in domain:
+        B = sparse.diags([1, -4, 1], [-1, 0, 1], shape=(n, n), dtype=float)
+        I = sparse.eye(n, dtype=float)
+        blocks = [[None for _ in range(n)] for _ in range(n)]
+        for i in range(n):
+            blocks[i][i] = B
+            if i > 0:
+                blocks[i][i-1] = I
+            if i < n - 1:
+                blocks[i][i+1] = I
+        A = sparse.bmat(blocks, format='csr')
+        
+        n2 = n**2
+        sizes.append(n2)
+        b = np.random.random(n2)
+
+        A_csr = A.tocsr()
+        start = time.time()
+        spla.spsolve(A_csr, b)
+        sparse_times.append(time.time() - start)
+
+        A_dense = A.toarray()
+        start = time.time()
+        la.solve(A_dense, b)
+        dense_times.append(time.time() - start)
+
+    print("System Sizes (n^2):", sizes)
+    print("Sparse Solver Times (spsolve):", sparse_times)
+    print("Dense Solver Times (la.solve):", dense_times)
+
+    plt.figure()
+    plt.loglog(sizes, sparse_times, 'o-', label="Sparse Solver (spsolve)")
+    plt.loglog(sizes, dense_times, 'o-', label="Dense Solver (la.solve)")
+    plt.xlabel("System Size ($n^2$)")
+    plt.ylabel("Execution Time (Seconds)")
+    plt.legend(loc="upper left")
+    plt.show()
+
+problem_6()
