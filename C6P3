@@ -1,0 +1,20 @@
+import numpy as np
+from scipy import linalg as la
+
+def problem_3(A, s):
+    if s > np.linalg.matrix_rank(A):
+        raise ValueError("s cannot be greater than the rank of A")
+    U, s_vals, Vh = la.svd(A, full_matrices=False)
+    U_s = U[:, :s]
+    s_s = s_vals[:s]
+    Vh_s = Vh[:s, :]
+    As = (U_s * s_s) @ Vh_s
+    storage = U_s.size + s_s.size + Vh_s.size
+    return As, storage
+
+A = np.random.random((20, 20))
+As, storage = problem_3(A, 5)
+
+print("Truncated Matrix As shape:", As.shape)
+print("Storage entries required:", storage)
+print("Rank of approximation As:", np.linalg.matrix_rank(As))
